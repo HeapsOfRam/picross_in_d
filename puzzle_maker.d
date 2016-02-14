@@ -1,5 +1,6 @@
 import std.stdio;
 import std.random;
+import std.conv;
 
 void main()
 {
@@ -30,6 +31,7 @@ void main()
     }
 
     int[][] x_sequences;
+    int max_x_hints = 0;
 
     for(int x = 0; x < x_dimension; ++x)
     {
@@ -60,10 +62,16 @@ void main()
             slice_sequences ~= single_sequence;
         }
 
+        if(to!int(slice_sequences.length) > max_x_hints)
+        {
+            max_x_hints = to!int(slice_sequences.length);
+        }
+
         x_sequences ~= slice_sequences;
     }
 
     int[][] y_sequences;
+    int max_y_hints;
 
     for(int y = 0; y <  y_dimension; ++y)
     {
@@ -77,8 +85,6 @@ void main()
             {
                 ++single_sequence;
                 should_add_end = true;
-                //writeln("sequence++");
-                //writeln("%d, %d", x, y);
             }
             else
             {
@@ -87,9 +93,6 @@ void main()
                     slice_sequences ~= single_sequence;
                     single_sequence = 0;
                     should_add_end = false;
-
-                    //writeln("sequence append");
-                    //writeln("%d, %d", x, y);
                 }
             }
         }
@@ -99,20 +102,12 @@ void main()
             slice_sequences ~= single_sequence;
         }
 
+        if(to!int(slice_sequences.length) > max_y_hints)
+        {
+            max_y_hints = to!int(slice_sequences.length);
+        }
+
         y_sequences ~= slice_sequences;
-    }
-
-    writeln("---X---");
-    for(int x = 0; x < x_sequences.length; ++x)
-    {
-        writeln(x_sequences[x]);
-    }
-
-
-    writeln("---Y---");
-    for(int y = 0; y < y_sequences.length; ++y)
-    {
-        writeln(y_sequences[y]);
     }
 
     writeln();
@@ -121,5 +116,70 @@ void main()
     for(int x = 0; x < x_dimension; ++x)
     {
         writeln(puzzle_board[x]);
+    }
+
+    write(" ");
+
+    for(int y = max_y_hints; y >= 0; --y)
+    {
+        for(int x = 0; x < max_x_hints; ++x)
+        {
+            write("   ");
+        }
+
+        write("   ");
+
+        for(int col = 0; col < y_dimension; ++col)
+        {
+            if(to!int(y_sequences[col].length) > y)
+            {
+                write(y_sequences[col][(to!int(y_sequences[col].length) - 1) - y]);
+            }
+            else
+            {
+                if(y < max_y_hints)
+                {
+                    write(" ");
+                }
+            }
+
+            write("   ");
+        }
+
+        writeln();
+    }
+
+    writeln();
+
+    for(int row = 0; row < x_dimension; ++row)
+    {
+        for(int x = max_x_hints; x >= 0; --x)
+        {
+            if(x < max_x_hints)
+            {
+                write("  ");
+            }
+
+            if(to!int(x_sequences[row].length) > x)
+            {
+                write(x_sequences[row][(to!int(x_sequences[row].length) - 1) - x]);
+            }
+            else
+            {
+                if(x < max_x_hints)
+                {
+                    write(" ");
+                }
+            }
+        }
+
+        for(int y = 0; y < y_dimension; ++y)
+        {
+            write("   ");
+            write(puzzle_board[row][y] ? "o" : "x");
+        }
+
+        writeln();
+        writeln();
     }
 }
